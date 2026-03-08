@@ -7,6 +7,7 @@ import (
 
 	"github.com/adrg/xdg"
 	"github.com/goccy/go-yaml"
+	"github.com/jessevdk/go-flags"
 )
 
 func GetDefaultConfigPath() string {
@@ -27,4 +28,22 @@ func ReadConfig(path string) (Config, error) {
 	}
 
 	return config, nil
+}
+
+func ReadFlags() (CommandLineArgs, error) {
+	cla := CommandLineArgs{}
+	_, err := flags.ParseArgs(&cla, os.Args[1:])
+	if err != nil {
+		return cla, err
+	}
+
+	if cla.ConfigPath == "" {
+		cla.ConfigPath = GetDefaultConfigPath()
+	}
+
+	if cla.ConnectionString == "" && cla.Profile == "" {
+		err = errors.New("Need to provide either connection string (-cs) or a profile (-p)")
+	}
+
+	return cla, err
 }

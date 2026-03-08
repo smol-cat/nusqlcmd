@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/jessevdk/go-flags"
 	_ "github.com/microsoft/go-mssqldb"
 	"github.com/smol-cat/nusqlcmd/src/common"
 	"github.com/smol-cat/nusqlcmd/src/config"
@@ -19,6 +20,15 @@ func (r RowScanner) Scan(src any) error {
 }
 
 func main() {
+	cmdParams, err := config.ReadFlags()
+	if err != nil {
+		if !flags.WroteHelp(err) {
+			fmt.Println(err.Error())
+		}
+
+		os.Exit(1)
+	}
+
 	configPath := config.GetDefaultConfigPath()
 	config, err := config.ReadConfig(configPath)
 	common.PanicOnErr(err)
@@ -31,7 +41,8 @@ func main() {
 		return
 	}
 
-	rows, err := dbConnection.Query(os.Args[1])
+	rows, err := dbConnection.Query(cmdParams.Query)
+	common.PanicOnErr(err)
 
 	var result = serialization.SerializeToJson(rows)
 	fmt.Print(result)
