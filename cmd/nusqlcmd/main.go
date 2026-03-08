@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/jessevdk/go-flags"
-	"github.com/smol-cat/nusqlcmd/src/common"
-	"github.com/smol-cat/nusqlcmd/src/config"
-	"github.com/smol-cat/nusqlcmd/src/core"
-	"github.com/smol-cat/nusqlcmd/src/serialization"
+	"github.com/smol-cat/nusqlcmd/internal/common"
+	"github.com/smol-cat/nusqlcmd/internal/config"
+	"github.com/smol-cat/nusqlcmd/internal/core"
+	"github.com/smol-cat/nusqlcmd/internal/serialization"
 )
 
 func main() {

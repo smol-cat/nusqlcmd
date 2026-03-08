@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/smol-cat/nusqlcmd/src/common"
+	"github.com/smol-cat/nusqlcmd/internal/common"
 )
 
 const MAX_COL_LENGTH = 30

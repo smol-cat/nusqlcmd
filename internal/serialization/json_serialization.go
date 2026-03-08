@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 
-	"github.com/smol-cat/nusqlcmd/src/common"
+	"github.com/smol-cat/nusqlcmd/internal/common"
 )
 
 func SerializeToJson(rows *sql.Rows) string {
