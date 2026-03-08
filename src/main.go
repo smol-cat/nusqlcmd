@@ -6,6 +6,7 @@ import (
 
 	_ "github.com/microsoft/go-mssqldb"
 	"github.com/smol-cat/nusqlcmd/src/common"
+	"github.com/smol-cat/nusqlcmd/src/config"
 	"github.com/smol-cat/nusqlcmd/src/core"
 	"github.com/smol-cat/nusqlcmd/src/serialization"
 )
@@ -18,12 +19,12 @@ func (r RowScanner) Scan(src any) error {
 }
 
 func main() {
-	dbConnection, err := core.ConnectToDb("sqlserver://sa:password123!@localhost:1433?database=master")
+	configPath := config.GetDefaultConfigPath()
+	config, err := config.ReadConfig(configPath)
+	common.PanicOnErr(err)
 
-	if err != nil {
-		fmt.Println(err.Error())
-		return
-	}
+	dbConnection, err := core.ConnectToDb(config.Profiles[0].ConnectionString)
+	common.PanicOnErr(err)
 
 	if dbConnection == nil {
 		fmt.Println("Failed to connect to the DB")
