@@ -1,6 +1,6 @@
 package config
 
-type Config struct {
+type AppConfig struct {
 	Profiles []Profile `yaml:"profiles"`
 }
 

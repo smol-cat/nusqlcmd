@@ -12,7 +12,7 @@ import (
 
 func main() {
 	configPath := config.GetDefaultConfigPath()
-	appConfig, err := config.ReadConfig(configPath)
+	appConfig, err := config.ReadAppConfig(configPath)
 	common.ExitOnErr(err, 1)
 
 	cmdParams, err := config.ReadFlags()

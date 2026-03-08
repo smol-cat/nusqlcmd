@@ -14,17 +14,17 @@ func GetDefaultConfigPath() string {
 	return path.Join(xdg.ConfigHome, "nusqlcmd/config.yaml")
 }
 
-func ReadConfig(path string) (Config, error) {
+func ReadAppConfig(path string) (AppConfig, error) {
 	bytes, err := os.ReadFile(path)
 	if err != nil {
-		return Config{}, errors.New("Config file open error: " + err.Error())
+		return AppConfig{}, errors.New("Config file open error: " + err.Error())
 	}
 
-	config := Config{}
+	config := AppConfig{}
 	err = yaml.Unmarshal(bytes, &config)
 
 	if err != nil {
-		return Config{}, errors.New("Config parse error: " + err.Error())
+		return AppConfig{}, errors.New("Config parse error: " + err.Error())
 	}
 
 	return config, nil
@@ -48,7 +48,7 @@ func ReadFlags() (CommandLineArgs, error) {
 	return cla, err
 }
 
-func getConnStringFromConfig(config Config, profile string) (string, error) {
+func getConnStringFromConfig(config AppConfig, profile string) (string, error) {
 	if len(config.Profiles) == 0 {
 		return "", errors.New("There are no profiles defined in the configuration file")
 	}
@@ -62,7 +62,7 @@ func getConnStringFromConfig(config Config, profile string) (string, error) {
 	return "", errors.New("Profile with name '" + profile + "' was not found in configuration")
 }
 
-func ConsolidateIntoRuntimeConfig(config Config, cla CommandLineArgs) (RuntimeConfig, error) {
+func ConsolidateIntoRuntimeConfig(config AppConfig, cla CommandLineArgs) (RuntimeConfig, error) {
 	runtimeConf := RuntimeConfig{}
 	runtimeConf.Query = cla.Query
 	runtimeConf.ConnectionString = cla.ConnectionString
