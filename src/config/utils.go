@@ -47,3 +47,34 @@ func ReadFlags() (CommandLineArgs, error) {
 
 	return cla, err
 }
+
+func getConnStringFromConfig(config Config, profile string) (string, error) {
+	if len(config.Profiles) == 0 {
+		return "", errors.New("There are no profiles defined in the configuration file")
+	}
+
+	for i := range config.Profiles {
+		if config.Profiles[i].Name == profile {
+			return config.Profiles[i].ConnectionString, nil
+		}
+	}
+
+	return "", errors.New("Profile with name '" + profile + "' was not found in configuration")
+}
+
+func ConsolidateIntoRuntimeConfig(config Config, cla CommandLineArgs) (RuntimeConfig, error) {
+	runtimeConf := RuntimeConfig{}
+	runtimeConf.Query = cla.Query
+	runtimeConf.ConnectionString = cla.ConnectionString
+
+	if runtimeConf.ConnectionString == "" {
+		connectionString, err := getConnStringFromConfig(config, cla.Profile)
+		if err != nil {
+			return runtimeConf, err
+		}
+
+		runtimeConf.ConnectionString = connectionString
+	}
+
+	return runtimeConf, nil
+}

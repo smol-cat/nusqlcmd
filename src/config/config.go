@@ -15,3 +15,8 @@ type CommandLineArgs struct {
 	Profile          string `short:"p" long:"profile" description:"A profile to use to connect to target database"`
 	Query            string `short:"q" long:"query" description:"A query to execute"`
 }
+
+type RuntimeConfig struct {
+	ConnectionString string
+	Query            string
+}

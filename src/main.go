@@ -10,14 +10,11 @@ import (
 	"github.com/smol-cat/nusqlcmd/src/serialization"
 )
 
-type RowScanner struct {
-}
-
-func (r RowScanner) Scan(src any) error {
-	return nil
-}
-
 func main() {
+	configPath := config.GetDefaultConfigPath()
+	appConfig, err := config.ReadConfig(configPath)
+	common.ExitOnErr(err, 1)
+
 	cmdParams, err := config.ReadFlags()
 	common.ExitOnErrFunc(err, 1, func(err error) {
 		if !flags.WroteHelp(err) {
@@ -25,11 +22,10 @@ func main() {
 		}
 	})
 
-	configPath := config.GetDefaultConfigPath()
-	config, err := config.ReadConfig(configPath)
+	runtimeConfig, err := config.ConsolidateIntoRuntimeConfig(appConfig, cmdParams)
 	common.ExitOnErr(err, 1)
 
-	dbConnection, err := core.ConnectToDb(config.Profiles[0].ConnectionString)
+	dbConnection, err := core.ConnectToDb(runtimeConfig.ConnectionString)
 	common.ExitOnErr(err, 1)
 
 	if dbConnection == nil {
@@ -37,7 +33,7 @@ func main() {
 		return
 	}
 
-	rows, err := dbConnection.Query(cmdParams.Query)
+	rows, err := dbConnection.Query(runtimeConfig.Query)
 	common.ExitOnErr(err, 1)
 
 	var result = serialization.SerializeToJson(rows)
