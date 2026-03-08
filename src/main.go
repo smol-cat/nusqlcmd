@@ -30,11 +30,10 @@ func main() {
 		return
 	}
 
-	fmt.Println(os.Args[1])
 	rows, err := dbConnection.Query(os.Args[1])
 
-	var result = serialization.SerializeRowsToTable(rows)
-	fmt.Println(result)
+	var result = serialization.SerializeToJson(rows)
+	fmt.Print(result)
 
 	common.PanicOnErr(err)
 }
