@@ -9,8 +9,9 @@ only SQL Server. Inspired by
 
 ## Usage 
 
+```
 Usage:
-  nusqlcmd \[OPTIONS\]
+  nusqlcmd [OPTIONS]
 
 Application Options:
   -c, --config=            A path for configuration
@@ -20,6 +21,7 @@ Application Options:
 
 Help Options:
   -h, --help               Show this help message
+```
 
 ## Application config
 
