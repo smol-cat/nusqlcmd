@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/jessevdk/go-flags"
@@ -29,15 +30,14 @@ func main() {
 	common.ExitOnErr(err, 1)
 
 	if dbConnection == nil {
-		fmt.Println("Failed to connect to the DB")
-		return
+		common.ExitOnErr(errors.New("Failed to connect to the DB"), 1)
 	}
 
 	rows, err := dbConnection.Query(runtimeConfig.Query)
 	common.ExitOnErr(err, 1)
 
-	var result = serialization.SerializeToJson(rows)
-	fmt.Print(result)
-
+	result, err := serialization.SerializeToJson(rows)
 	common.ExitOnErr(err, 1)
+
+	fmt.Print(result)
 }

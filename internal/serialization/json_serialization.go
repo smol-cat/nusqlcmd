@@ -3,11 +3,9 @@ package serialization
 import (
 	"database/sql"
 	"encoding/json"
-
-	"github.com/smol-cat/nusqlcmd/internal/common"
 )
 
-func scanRow(rows *sql.Rows, colCount int) []*string {
+func scanRow(rows *sql.Rows, colCount int) ([]*string, error) {
 	var rawCols = make([]any, colCount)
 
 	for i := range rawCols {
@@ -15,24 +13,30 @@ func scanRow(rows *sql.Rows, colCount int) []*string {
 		rawCols[i] = &alloc
 	}
 
-	err := rows.Scan(rawCols...)
-	common.PanicOnErr(err)
+	if err := rows.Scan(rawCols...); err != nil {
+		return nil, err
+	}
 
 	var cols = make([]*string, colCount)
 	for i := range rawCols {
 		cols[i] = *(rawCols[i].(**string))
 	}
 
-	return cols
+	return cols, nil
 }
 
-func SerializeToJson(rows *sql.Rows) string {
+func SerializeToJson(rows *sql.Rows) (string, error) {
 	colNames, err := rows.Columns()
-	common.PanicOnErr(err)
+	if err != nil {
+		return "", err
+	}
 
 	result := []map[string]any{}
 	for rows.Next() {
-		cols := scanRow(rows, len(colNames))
+		cols, err := scanRow(rows, len(colNames))
+		if err != nil {
+			return "", err
+		}
 
 		colsMap := map[string]any{}
 		for i := range colNames {
@@ -43,7 +47,5 @@ func SerializeToJson(rows *sql.Rows) string {
 	}
 
 	resultString, err := json.MarshalIndent(result, "", "    ")
-	common.PanicOnErr(err)
-
-	return string(resultString)
+	return string(resultString), err
 }
