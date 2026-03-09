@@ -6,7 +6,7 @@
   outputs =
     { self, nixpkgs }:
     let
-      version = "0.1.1";
+      version = "0.2.0";
       supportedSystems = [
         "x86_64-linux"
         "x86_64-darwin"
@@ -29,7 +29,7 @@
             pname = "nusqlcmd";
             inherit version;
             src = ./.;
-            vendorHash = "sha256-r2N6qr1P6ElMyYMnvYwjsc6iGsakp4qWTxZP4eJ2jGw=";
+            vendorHash = "sha256-oOBuAeenj7Jq4VRBK9VKSlx+/e3LnQ5yJqQloOsr2SQ=";
           };
         }
       );
