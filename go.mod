@@ -3,8 +3,13 @@ module github.com/smol-cat/nusqlcmd
 go 1.25.7
 
 require (
-	github.com/adrg/xdg v0.5.3 // indirect
-	github.com/goccy/go-yaml v1.19.2 // indirect
+	github.com/adrg/xdg v0.5.3
+	github.com/goccy/go-yaml v1.19.2
+	github.com/jessevdk/go-flags v1.6.1
+	github.com/microsoft/go-mssqldb v1.9.8
+)
+
+require (
 	github.com/golang-sql/civil v0.0.0-20220223132316-b832511892a9 // indirect
 	github.com/golang-sql/sqlexp v0.1.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
@@ -15,8 +20,6 @@ require (
 	github.com/jcmturner/goidentity/v6 v6.0.1 // indirect
 	github.com/jcmturner/gokrb5/v8 v8.4.4 // indirect
 	github.com/jcmturner/rpc/v2 v2.0.3 // indirect
-	github.com/jessevdk/go-flags v1.6.1 // indirect
-	github.com/microsoft/go-mssqldb v1.9.8 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
 	golang.org/x/crypto v0.48.0 // indirect
 	golang.org/x/net v0.51.0 // indirect

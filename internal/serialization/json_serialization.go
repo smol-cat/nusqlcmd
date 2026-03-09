@@ -3,23 +3,26 @@ package serialization
 import (
 	"database/sql"
 	"encoding/json"
+
+	"github.com/smol-cat/nusqlcmd/internal/core/mssql"
 )
 
-func scanRow(rows *sql.Rows, colCount int) ([]*string, error) {
-	var rawCols = make([]any, colCount)
+func scanRow(rows *sql.Rows, colTypes []*sql.ColumnType) ([]any, error) {
+	rawCols := make([]any, len(colTypes))
 
-	for i := range rawCols {
-		var alloc *string
-		rawCols[i] = &alloc
+	for i, colType := range colTypes {
+		typeName := colType.DatabaseTypeName()
+		nullable, _ := colType.Nullable()
+		rawCols[i] = mssql.MapTypeNameToGoType(typeName, nullable)
 	}
 
 	if err := rows.Scan(rawCols...); err != nil {
 		return nil, err
 	}
 
-	var cols = make([]*string, colCount)
+	cols := make([]any, len(colTypes))
 	for i := range rawCols {
-		cols[i] = *(rawCols[i].(**string))
+		cols[i] = mssql.GetValueFromScanned(rawCols[i])
 	}
 
 	return cols, nil
@@ -31,9 +34,14 @@ func SerializeToJson(rows *sql.Rows) (string, error) {
 		return "", err
 	}
 
+	colTypes, err := rows.ColumnTypes()
+	if err != nil {
+		return "", err
+	}
+
 	result := []map[string]any{}
 	for rows.Next() {
-		cols, err := scanRow(rows, len(colNames))
+		cols, err := scanRow(rows, colTypes)
 		if err != nil {
 			return "", err
 		}
