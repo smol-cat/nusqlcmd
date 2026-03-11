@@ -9,11 +9,14 @@ import (
 
 func scanRow(rows *sql.Rows, colTypes []*sql.ColumnType) ([]any, error) {
 	rawCols := make([]any, len(colTypes))
+	colExtractors := make([]func(any) any, len(colTypes))
 
 	for i, colType := range colTypes {
 		typeName := colType.DatabaseTypeName()
 		nullable, _ := colType.Nullable()
-		rawCols[i] = mssql.MapTypeNameToGoType(typeName, nullable)
+		col, extractor := mssql.MapTypeNameToGoType(typeName, nullable)
+		rawCols[i] = col
+		colExtractors[i] = extractor
 	}
 
 	if err := rows.Scan(rawCols...); err != nil {
@@ -21,8 +24,8 @@ func scanRow(rows *sql.Rows, colTypes []*sql.ColumnType) ([]any, error) {
 	}
 
 	cols := make([]any, len(colTypes))
-	for i := range rawCols {
-		cols[i] = mssql.GetValueFromScanned(rawCols[i])
+	for i := range colTypes {
+		cols[i] = colExtractors[i](rawCols[i])
 	}
 
 	return cols, nil
