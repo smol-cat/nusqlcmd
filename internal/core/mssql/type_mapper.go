@@ -13,7 +13,7 @@ func MapTypeNameToSqlType(typeName string, nullable bool) sqlcolumns.SqlColumn {
 	case "SMALLINT":
 		return sqlcolumns.Int16(nullable)
 	case "TINYINT":
-		return sqlcolumns.Int8(nullable)
+		return sqlcolumns.UInt8(nullable)
 	case "FLOAT", "REAL", "DECIMAL", "NUMERIC", "MONEY", "SMALLMONEY":
 		return sqlcolumns.Float64(nullable)
 	case "BIT":

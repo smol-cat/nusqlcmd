@@ -2,7 +2,7 @@ package sqlcolumns
 
 import "database/sql"
 
-func Int8(nullable bool) SqlColumn {
+func UInt8(nullable bool) SqlColumn {
 	if nullable {
 		return SqlColumn{
 			Value: &sql.NullByte{},
@@ -14,9 +14,9 @@ func Int8(nullable bool) SqlColumn {
 	}
 
 	return SqlColumn{
-		Value: new(int8),
+		Value: new(uint8),
 		Scan: func(v any) any {
-			return *v.(*int8)
+			return *v.(*uint8)
 		},
 	}
 }
