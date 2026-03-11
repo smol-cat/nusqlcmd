@@ -5,30 +5,31 @@ import (
 	"encoding/json"
 
 	"github.com/smol-cat/nusqlcmd/internal/core/mssql"
+	"github.com/smol-cat/nusqlcmd/internal/core/sql_columns"
 )
 
 func scanRow(rows *sql.Rows, colTypes []*sql.ColumnType) ([]any, error) {
-	rawCols := make([]any, len(colTypes))
-	colExtractors := make([]func(any) any, len(colTypes))
+	sqlColumns := make([]sqlcolumns.SqlColumn, len(colTypes))
+	mapTarget := make([]any, len(colTypes))
 
 	for i, colType := range colTypes {
 		typeName := colType.DatabaseTypeName()
 		nullable, _ := colType.Nullable()
-		col, extractor := mssql.MapTypeNameToGoType(typeName, nullable)
-		rawCols[i] = col
-		colExtractors[i] = extractor
+		sqlColumns[i] = mssql.MapTypeNameToSqlType(typeName, nullable)
+
+		mapTarget[i] = sqlColumns[i].Value
 	}
 
-	if err := rows.Scan(rawCols...); err != nil {
+	if err := rows.Scan(mapTarget...); err != nil {
 		return nil, err
 	}
 
-	cols := make([]any, len(colTypes))
+	resultCols := make([]any, len(colTypes))
 	for i := range colTypes {
-		cols[i] = colExtractors[i](rawCols[i])
+		resultCols[i] = sqlColumns[i].Scan(mapTarget[i])
 	}
 
-	return cols, nil
+	return resultCols, nil
 }
 
 func SerializeToJson(rows *sql.Rows) (string, error) {
