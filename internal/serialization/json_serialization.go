@@ -4,12 +4,12 @@ import (
 	"database/sql"
 	"encoding/json"
 
+	"github.com/smol-cat/nusqlcmd/internal/core"
 	"github.com/smol-cat/nusqlcmd/internal/core/mssql"
-	"github.com/smol-cat/nusqlcmd/internal/core/sql_columns"
 )
 
 func scanRow(rows *sql.Rows, colTypes []*sql.ColumnType) ([]any, error) {
-	sqlColumns := make([]sqlcolumns.SqlColumn, len(colTypes))
+	sqlColumns := make([]core.SqlColumn, len(colTypes))
 	mapTarget := make([]any, len(colTypes))
 
 	for i, colType := range colTypes {

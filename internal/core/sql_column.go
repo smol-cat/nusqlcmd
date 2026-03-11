@@ -1,4 +1,4 @@
-package sqlcolumns
+package core
 
 type SqlColumn struct {
 	Value any
