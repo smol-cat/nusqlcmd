@@ -5,24 +5,36 @@ import (
 	"github.com/smol-cat/nusqlcmd/internal/core"
 )
 
+func allocateNullUUID() any {
+	return new(mssql_driver.NullUniqueIdentifier)
+}
+
+func allocateUUID() any {
+	return new(mssql_driver.UniqueIdentifier)
+}
+
+func scanNullUUID(v any) any {
+	if !v.(*mssql_driver.NullUniqueIdentifier).Valid {
+		return nil
+	}
+
+	return v.(*mssql_driver.NullUniqueIdentifier).String()
+}
+
+func scanUUID(v any) any {
+	return v.(*mssql_driver.UniqueIdentifier).String()
+}
+
 func UUID(nullable bool) core.SqlColumn {
 	if nullable {
 		return core.SqlColumn{
-			Value: &mssql_driver.NullUniqueIdentifier{},
-			Scan: func(v any) any {
-				if !v.(*mssql_driver.NullUniqueIdentifier).Valid {
-					return nil
-				}
-
-				return v.(*mssql_driver.NullUniqueIdentifier).String()
-			},
+			AllocateValue: allocateNullUUID,
+			Scan:          scanNullUUID,
 		}
 	}
 
 	return core.SqlColumn{
-		Value: &mssql_driver.UniqueIdentifier{},
-		Scan: func(v any) any {
-			return v.(*mssql_driver.UniqueIdentifier).String()
-		},
+		AllocateValue: allocateUUID,
+		Scan:          scanUUID,
 	}
 }

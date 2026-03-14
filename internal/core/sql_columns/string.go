@@ -6,21 +6,33 @@ import (
 	"github.com/smol-cat/nusqlcmd/internal/core"
 )
 
+func allocateNullString() any {
+	return new(sql.NullString)
+}
+
+func allocateString() any {
+	return new(string)
+}
+
+func scanNullString(v any) any {
+	val, _ := v.(*sql.NullString).Value()
+	return val
+}
+
+func scanString(v any) any {
+	return *v.(*string)
+}
+
 func String(nullable bool) core.SqlColumn {
 	if nullable {
 		return core.SqlColumn{
-			Value: &sql.NullString{},
-			Scan: func(v any) any {
-				val, _ := v.(*sql.NullString).Value()
-				return val
-			},
+			AllocateValue: allocateNullString,
+			Scan:          scanNullString,
 		}
 	}
 
 	return core.SqlColumn{
-		Value: new(string),
-		Scan: func(v any) any {
-			return *v.(*string)
-		},
+		AllocateValue: allocateString,
+		Scan:          scanString,
 	}
 }

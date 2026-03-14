@@ -8,24 +8,31 @@ import (
 	"github.com/smol-cat/nusqlcmd/internal/core/mssql"
 )
 
-func scanRow(rows *sql.Rows, colTypes []*sql.ColumnType) ([]any, error) {
+func getSqlColumns(colTypes []*sql.ColumnType) []core.SqlColumn {
 	sqlColumns := make([]core.SqlColumn, len(colTypes))
-	mapTarget := make([]any, len(colTypes))
 
 	for i, colType := range colTypes {
 		typeName := colType.DatabaseTypeName()
 		nullable, _ := colType.Nullable()
 		sqlColumns[i] = mssql.MapTypeNameToSqlType(typeName, nullable)
+	}
 
-		mapTarget[i] = sqlColumns[i].Value
+	return sqlColumns
+}
+
+func scanRow(rows *sql.Rows, sqlColumns []core.SqlColumn) ([]any, error) {
+	mapTarget := make([]any, len(sqlColumns))
+
+	for i, col := range sqlColumns {
+		mapTarget[i] = col.AllocateValue()
 	}
 
 	if err := rows.Scan(mapTarget...); err != nil {
 		return nil, err
 	}
 
-	resultCols := make([]any, len(colTypes))
-	for i := range colTypes {
+	resultCols := make([]any, len(sqlColumns))
+	for i := range sqlColumns {
 		resultCols[i] = sqlColumns[i].Scan(mapTarget[i])
 	}
 
@@ -43,9 +50,11 @@ func SerializeToJson(rows *sql.Rows) (string, error) {
 		return "", err
 	}
 
+	sqlColumns := getSqlColumns(colTypes)
+
 	result := []map[string]any{}
 	for rows.Next() {
-		cols, err := scanRow(rows, colTypes)
+		cols, err := scanRow(rows, sqlColumns)
 		if err != nil {
 			return "", err
 		}

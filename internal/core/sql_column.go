@@ -1,6 +1,6 @@
 package core
 
 type SqlColumn struct {
-	Value any
+	AllocateValue func() any
 	Scan func(any) any
 }
