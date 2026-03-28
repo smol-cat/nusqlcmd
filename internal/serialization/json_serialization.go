@@ -4,20 +4,24 @@ import (
 	"database/sql"
 	"encoding/json"
 
+	"github.com/smol-cat/nusqlcmd/internal/config"
 	"github.com/smol-cat/nusqlcmd/internal/core"
-	"github.com/smol-cat/nusqlcmd/internal/core/mssql"
 )
 
-func getSqlColumns(colTypes []*sql.ColumnType) []core.SqlColumn {
+func getSqlColumns(colTypes []*sql.ColumnType, driver string) ([]core.SqlColumn, error) {
 	sqlColumns := make([]core.SqlColumn, len(colTypes))
+	mapType, err := getMapper(driver)
+	if err != nil {
+		return nil, err
+	}
 
 	for i, colType := range colTypes {
 		typeName := colType.DatabaseTypeName()
 		nullable, _ := colType.Nullable()
-		sqlColumns[i] = mssql.MapTypeNameToSqlType(typeName, nullable)
+		sqlColumns[i] = mapType(typeName, nullable)
 	}
 
-	return sqlColumns
+	return sqlColumns, nil
 }
 
 func scanRow(rows *sql.Rows, sqlColumns []core.SqlColumn) ([]any, error) {
@@ -39,7 +43,7 @@ func scanRow(rows *sql.Rows, sqlColumns []core.SqlColumn) ([]any, error) {
 	return resultCols, nil
 }
 
-func SerializeToJson(rows *sql.Rows) (string, error) {
+func SerializeToJson(rows *sql.Rows, runtimeConfig config.RuntimeConfig) (string, error) {
 	colNames, err := rows.Columns()
 	if err != nil {
 		return "", err
@@ -50,7 +54,10 @@ func SerializeToJson(rows *sql.Rows) (string, error) {
 		return "", err
 	}
 
-	sqlColumns := getSqlColumns(colTypes)
+	sqlColumns, err := getSqlColumns(colTypes, runtimeConfig.Driver)
+	if err != nil {
+		return "", err
+	}
 
 	result := []map[string]any{}
 	for rows.Next() {

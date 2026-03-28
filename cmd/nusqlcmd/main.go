@@ -36,7 +36,7 @@ func main() {
 	rows, err := dbConnection.Query(runtimeConfig.Query)
 	common.ExitOnErr(err, 1)
 
-	result, err := serialization.SerializeToJson(rows)
+	result, err := serialization.SerializeToJson(rows, runtimeConfig)
 	common.ExitOnErr(err, 1)
 
 	fmt.Print(result)
