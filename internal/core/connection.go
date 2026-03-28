@@ -5,6 +5,7 @@ import (
 
 	_ "github.com/microsoft/go-mssqldb"
 	_ "github.com/microsoft/go-mssqldb/integratedauth/krb5"
+	_ "github.com/lib/pq"
 	"github.com/smol-cat/nusqlcmd/internal/config"
 )
 
