@@ -26,7 +26,7 @@ func main() {
 	runtimeConfig, err := config.ConsolidateIntoRuntimeConfig(appConfig, cmdParams)
 	common.ExitOnErr(err, 1)
 
-	dbConnection, err := core.ConnectToDb(runtimeConfig.ConnectionString)
+	dbConnection, err := core.ConnectToDb(runtimeConfig)
 	common.ExitOnErr(err, 1)
 
 	if dbConnection == nil {

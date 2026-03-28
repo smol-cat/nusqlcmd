@@ -6,17 +6,20 @@ type AppConfig struct {
 
 type Profile struct {
 	Name             string `yaml:"name"`
+	Driver           string `yaml:"driver"`
 	ConnectionString string `yaml:"connectionString"`
 }
 
 type CommandLineArgs struct {
 	ConfigPath       string `short:"c" long:"config" description:"A path for configuration"`
+	Driver           string `short:"d" long:"driver" description:"A path for configuration"`
 	ConnectionString string `short:"s" long:"connection-string" description:"Connection string to use to connect to database"`
 	Profile          string `short:"p" long:"profile" description:"A profile to use to connect to target database"`
 	Query            string `short:"q" long:"query" description:"A query to execute"`
 }
 
 type RuntimeConfig struct {
+	Driver           string
 	ConnectionString string
 	Query            string
 }

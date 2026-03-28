@@ -41,39 +41,41 @@ func ReadFlags() (CommandLineArgs, error) {
 		cla.ConfigPath = GetDefaultConfigPath()
 	}
 
-	if cla.ConnectionString == "" && cla.Profile == "" {
-		err = errors.New("Need to provide either connection string (-cs) or a profile (-p)")
+	if (cla.ConnectionString == "" || cla.Driver == "") && cla.Profile == "" {
+		err = errors.New("Need to provide either both connection string (-s) and driver (-d) or only a profile (-p)")
 	}
 
 	return cla, err
 }
 
-func getConnStringFromConfig(config AppConfig, profile string) (string, error) {
+func getProfileFromConfig(config AppConfig, profile string) (Profile, error) {
 	if len(config.Profiles) == 0 {
-		return "", errors.New("There are no profiles defined in the configuration file")
+		return Profile{}, errors.New("There are no profiles defined in the configuration file")
 	}
 
 	for i := range config.Profiles {
 		if config.Profiles[i].Name == profile {
-			return config.Profiles[i].ConnectionString, nil
+			return config.Profiles[i], nil
 		}
 	}
 
-	return "", errors.New("Profile with name '" + profile + "' was not found in configuration")
+	return Profile{}, errors.New("Profile with name '" + profile + "' was not found in configuration")
 }
 
 func ConsolidateIntoRuntimeConfig(config AppConfig, cla CommandLineArgs) (RuntimeConfig, error) {
 	runtimeConf := RuntimeConfig{}
 	runtimeConf.Query = cla.Query
+	runtimeConf.Driver = cla.Driver
 	runtimeConf.ConnectionString = cla.ConnectionString
 
-	if runtimeConf.ConnectionString == "" {
-		connectionString, err := getConnStringFromConfig(config, cla.Profile)
+	if runtimeConf.ConnectionString == "" || runtimeConf.Driver == "" {
+		profile, err := getProfileFromConfig(config, cla.Profile)
 		if err != nil {
 			return runtimeConf, err
 		}
 
-		runtimeConf.ConnectionString = connectionString
+		runtimeConf.ConnectionString = profile.ConnectionString
+		runtimeConf.Driver = profile.Driver
 	}
 
 	return runtimeConf, nil
