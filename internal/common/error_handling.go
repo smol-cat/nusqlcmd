@@ -23,3 +23,7 @@ func ExitOnErrFunc(err error, code int, action func(error)) {
 		os.Exit(code)
 	}
 }
+
+func WarnUnrecognizedType(typeName string) {
+	fmt.Fprintf(os.Stderr, "Warning: Unrecognized type '%s', defaulting to string\n", typeName)
+}
