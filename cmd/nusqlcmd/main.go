@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"os"
 
 	"github.com/jessevdk/go-flags"
 	"github.com/smol-cat/nusqlcmd/internal/common"
@@ -19,7 +20,7 @@ func main() {
 	cmdParams, err := config.ReadFlags()
 	common.ExitOnErrFunc(err, 1, func(err error) {
 		if !flags.WroteHelp(err) {
-			fmt.Println(err.Error())
+			fmt.Fprintln(os.Stderr, err.Error())
 		}
 	})
 

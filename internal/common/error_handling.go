@@ -13,7 +13,7 @@ func PanicOnErr(err error) {
 
 func ExitOnErr(err error, code int) {
 	ExitOnErrFunc(err, code, func(err error) {
-		fmt.Println("Error: " + err.Error())
+		fmt.Fprintln(os.Stderr, "Error: " + err.Error())
 	})
 }
 
